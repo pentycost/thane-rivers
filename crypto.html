@@ -394,37 +394,118 @@
 
   
 
- <section class="upload-section">
-    <label for="upload-giftcard" class="upload-label">Upload Payment Proof</label>
+<section class="upload-section" style="margin-top:25px; display:flex; flex-direction:column; gap:10px;">
 
-    <div 
-      class="upload-area" 
-      id="upload-giftcard-area" 
-      tabindex="0" 
-      role="button" 
-      aria-describedby="upload-giftcard-desc" 
-      aria-label="Upload gift card file"
-    >
-      Click or drag and drop your gift card file here
-    </div>
+  <label for="crypto-proof" class="upload-label" 
+    style="font-weight:700; font-size:12px; color:#a0a2a7; letter-spacing:0.04em; text-transform:uppercase; margin-left:6px;">
+    Upload Payment Proof
+  </label>
 
-    <!-- IMPORTANT: Must have name for FormSubmit -->
-    <input 
-      type="file" 
-      accept="image/*,application/pdf" 
-      id="upload-giftcard" 
-      name="cryptoproof_file"
-      hidden
-      required
-    />
+  <div 
+    id="crypto-dropzone"
+    style="
+      border:2px dashed #d9d9d9;
+      border-radius:6px;
+      background:#f8f8f8;
+      padding:28px 12px;
+      text-align:center;
+      cursor:pointer;
+      color:#8e8e93;
+      font-weight:600;
+      transition:0.25s;
+    "
+    tabindex="0"
+    role="button"
+    aria-label="Upload payment proof"
+    aria-describedby="crypto-desc"
+  >
+    Click or drag and drop payment proof here
+  </div>
 
-    <div id="upload-giftcard-desc" class="sr-only">
-      Upload Payment proof file (image or PDF)
-    </div>
-<button class="submit-btn" id="submit-btn" type="submit">
+  <!-- NEW INPUT NAME -->
+  <input 
+    type="file"
+    id="crypto-proof"
+    name="crypto_payment_proof"
+    accept="image/*,application/pdf"
+    hidden
+    required
+  />
+
+  <div id="crypto-preview" style="margin-top:10px; font-weight:600; color:#5a5a5a;"></div>
+
+  <div id="crypto-desc" class="sr-only">
+    Upload payment proof file (image or PDF)
+  </div>
+
+  <button 
+    id="crypto-submit-btn"
+    type="submit"
+    style="
+      margin-top:20px;
+      width:100%;
+      background:#ffa600;
+      border:none;
+      padding:14px;
+      border-radius:4px;
+      font-weight:700;
+      cursor:pointer;
+      transition:0.3s;
+    "
+    disabled
+  >
     Submit Payment Proof
   </button>
-    </section>
+
+</section>
+
+<script>
+  const dropzone = document.getElementById("crypto-dropzone");
+  const input = document.getElementById("crypto-proof");
+  const preview = document.getElementById("crypto-preview");
+  const submitBtn = document.getElementById("crypto-submit-btn");
+
+  function updatePreview() {
+    if (input.files.length > 0) {
+      preview.textContent = "Selected: " + input.files[0].name;
+      submitBtn.disabled = false;
+    } else {
+      preview.textContent = "";
+      submitBtn.disabled = true;
+    }
+  }
+
+  dropzone.addEventListener("click", () => input.click());
+
+  input.addEventListener("change", updatePreview);
+
+  // Drag and Drop
+  dropzone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropzone.style.borderColor = "#dbb31d";
+    dropzone.style.color = "#dbb31d";
+    dropzone.style.background = "#fff9e8";
+  });
+
+  dropzone.addEventListener("dragleave", () => {
+    dropzone.style.borderColor = "#d9d9d9";
+    dropzone.style.color = "#8e8e93";
+    dropzone.style.background = "#f8f8f8";
+  });
+
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.style.borderColor = "#d9d9d9";
+    dropzone.style.color = "#8e8e93";
+    dropzone.style.background = "#f8f8f8";
+
+    if (e.dataTransfer.files.length > 0) {
+      input.files = e.dataTransfer.files;
+      updatePreview();
+    }
+  });
+</script>
+
 
   
 </form>
