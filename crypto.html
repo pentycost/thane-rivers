@@ -621,17 +621,7 @@
       }
     });
 
-    // Confirm payment button alert
-    payBtn.addEventListener("click", () => {
-      if (fileInput.files.length === 0) {
-        alert("Please upload payment proof to confirm.");
-        return;
-      }
-      alert("Thank you! We have received your payment proof and will verify your crypto payment shortly.");
-      payBtn.disabled = true;
-      payBtn.textContent = "Verification in progress...";
-      // Here, submit form or handle payment confirmation
-    });
+    
   </script>
 
   <style>
