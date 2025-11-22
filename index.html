@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Thane Rivers — Transfer Vote</title>
+<style>
+  /* Base Reset */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #12161c;
+    color: #b8cad9;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Navbar */
+  header {
+    background-color: #1c2530;
+    padding: 15px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.6);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    color: #4fd1c5;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    user-select: none;
+  }
+
+  nav ul {
+    list-style: none;
+    display: flex;
+    gap: 22px;
+  }
+
+  nav ul li a {
+    color: #9bb4c3;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  nav ul li a:hover,
+  nav ul li a:focus {
+    background-color: #2d3a4a;
+    color: #4fd1c5;
+    outline: none;
+  }
+
+  /* Main Hero Section */
+  main.hero {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 70px 20px 60px;
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  main.hero h1 {
+    font-size: 2.75rem;
+    font-weight: 700;
+    color: #4fd1c5;
+    margin-bottom: 18px;
+    line-height: 1.1;
+  }
+
+  main.hero h2 {
+    font-weight: 600;
+    font-size: 1.15rem;
+    color: #8ca2b9;
+    margin-bottom: 28px;
+  }
+
+  main.hero p {
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 480px;
+    margin-bottom: 45px;
+    color: #a3b3c7;
+  }
+
+  /* Button group with badge below */
+  .btn-group {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  button.vote-btn {
+    background-color: #4fd1c5;
+    border: none;
+    font-weight: 700;
+    padding: 16px 65px;
+    border-radius: 60px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #12161c;
+    box-shadow: 0 5px 20px rgba(79, 209, 197, 0.4);
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    user-select: none;
+  }
+
+  button.vote-btn:hover,
+  button.vote-btn:focus {
+    background-color: #3bb3ad;
+    outline: none;
+    box-shadow: 0 8px 28px rgba(59, 179, 173, 0.6);
+  }
+
+  .btn-badge {
+    background-color: #3bb3ad;
+    color: #12161c;
+    font-weight: 900;
+    font-size: 1.4rem;
+    padding: 12px 34px;
+    border-radius: 32px;
+    box-shadow: 0 4px 12px rgba(59, 179, 173, 0.5);
+    user-select: none;
+    letter-spacing: 0.07em;
+    width: 80px;
+    text-align: center;
+  }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 26px 16px;
+    font-size: 0.875rem;
+    color: #4f6477;
+    background-color: #1c2530;
+  }
+
+  /* Responsive for mobile */
+  @media (max-width: 520px) {
+    main.hero h1 {
+      font-size: 2rem;
+    }
+    main.hero h2 {
+      font-size: 1rem;
+    }
+    main.hero p {
+      font-size: 0.9rem;
+      max-width: 100%;
+    }
+    button.vote-btn {
+      padding: 16px 45px;
+      font-size: 1.1rem;
+      width: 100%;
+      max-width: 280px;
+    }
+    .btn-badge {
+      width: 60px;
+      font-size: 1.1rem;
+      padding: 10px 18px;
+    }
+    nav ul {
+      gap: 15px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header role="banner">
+  <div class="logo" aria-label="Thane Rivers Voting System">Thane Rivers</div>
+  <nav role="navigation" aria-label="Primary Navigation">
+    <ul>
+      <li><a href="#" aria-current="page">Home</a></li>
+      
+    </ul>
+  </nav>
+</header>
+
+<main class="hero" role="main">
+  <h1>Thane Rivers — Transfer Vote</h1>
+  <h2>Fans vote where Thane will be posted. Only Voting System.</h2>
+  <p>Your voice matters! Join thousands of fans helping decide the next location for Thane Rivers' posts. Cast your vote now to influence the next steps and be part of the official fanbase movement.</p>
+
+  <div class="btn-group">
+    <a href="register.html"><button class="vote-btn" aria-label="Make Your Vote">Make Your Vote</button></a>
+    
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 Thane Rivers Voting System. All rights reserved.
+</footer>
+
+</body>
+<script>
+    // If user has already reached dashboard before
+    if (localStorage.getItem("dashboardAccess") === "true") {
+        window.location.href = "dashboard.html";
+    }
+</script>
+
+</html>
