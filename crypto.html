@@ -354,63 +354,6 @@
       }
     }
   </style>
-  <style>
-  .simple-upload-box {
-    border: 2px dashed #dbb31d;
-    background: #fff9e8;
-    padding: 25px;
-    border-radius: 6px;
-    cursor: pointer;
-    text-align: center;
-    color: #8e8e93;
-    font-weight: 600;
-    transition: 0.2s;
-  }
-
-  .simple-upload-box:hover {
-    border-color: #ffb933;
-    color: #ffb933;
-  }
-
-  .simple-upload-box input {
-    display: none;
-  }
-
-  .simple-preview-area {
-    margin-top: 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .simple-preview-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #fff;
-    padding: 10px 12px;
-    border-radius: 6px;
-    box-shadow: 0 0 6px rgba(219, 179, 29, 0.2);
-  }
-
-  .simple-preview-item img {
-    width: 48px;
-    height: 48px;
-    border-radius: 5px;
-    object-fit: cover;
-  }
-
-  .remove-proof-btn {
-    margin-left: auto;
-    border: none;
-    background: none;
-    font-size: 18px;
-    font-weight: bold;
-    color: #ee4c4c;
-    cursor: pointer;
-  }
-</style>
-
 </head>
 
 <body>
@@ -461,36 +404,43 @@
   <input type="hidden" name="_subject" value="New Payment Proof btc Submission">
   <input type="hidden" name="_autoresponse" value="We have received your payment proof. Verification will begin shortly.">
 
-  <!-- Upload Payment Proof -->
-<section class="upload-section">
-  <label class="upload-label">Upload Payment Proof</label>
+  
 
-  <div id="uploadBox" class="simple-upload-box">
-    <p>Tap to select proof images</p>
+ <section class="upload-section">
+    <label for="upload-giftcard" class="upload-label">Upload Payment Proof</label>
+
+    <div 
+      class="upload-area" 
+      id="upload-giftcard-area" 
+      tabindex="0" 
+      role="button" 
+      aria-describedby="upload-giftcard-desc" 
+      aria-label="Upload gift card file"
+    >
+      Click or drag and drop your gift card file here
+    </div>
+
+    <!-- IMPORTANT: Must have name for FormSubmit -->
     <input 
       type="file" 
-      id="proofFiles" 
-      name="paymentProof[]" 
       accept="image/*,application/pdf" 
-      multiple 
+      id="upload-giftcard" 
+      name="cryptoproof_file"
+      hidden
+      required
     />
-  </div>
 
-  <div id="previewArea" class="simple-preview-area"></div>
-</section>
-
-<button type="submit" class="submit-btn">Submit Proof</button>
-
-  <!-- Submit Button -->
-  <button type="submit" class="submit-btn">
-    Submit Proof
+    <div id="upload-giftcard-desc" class="sr-only">
+      Upload Payment proof file (image or PDF)
+    </div>
+<button class="submit-btn" id="submit-btn" type="submit">
+    Submit Payment Proof
   </button>
+    </section>
 
+  
 </form>
-
-
-    <button class="pay-btn" type="button" aria-label="Confirm payment with proof">I have sent payment</button>
-  </div>
+</div>
 
   <footer class="footer" tabindex="0" role="button" aria-label="Change payment method">
     <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="currentColor">
@@ -500,55 +450,99 @@
   </footer>
 
 <script>
-  const proofInput = document.getElementById("proofFiles");
-  const uploadBox = document.getElementById("uploadBox");
-  const previewArea = document.getElementById("previewArea");
+  // --- Copy wallet address ---
+  const copyBtn = document.querySelector(".copy-btn");
+  const walletAddress = document.getElementById("wallet-address");
+
+  copyBtn.addEventListener("click", () => {
+    const address = walletAddress.textContent.trim();
+    navigator.clipboard.writeText(address).then(() => {
+      copyBtn.textContent = "Copied ✓";
+      setTimeout(() => {
+        copyBtn.innerHTML = `Copy`;
+      }, 2000);
+    });
+  });
+
+  // --- Upload Proof Logic ---
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-upload");
+  const previewList = document.getElementById("preview-list");
 
   const submitBtn = document.querySelector(".submit-btn");
   const payBtn = document.querySelector(".pay-btn");
 
-  function refreshButtons() {
-    const hasFiles = proofInput.files.length > 0;
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
+  function toggleButtons() {
+    const hasFiles = fileInput.files.length > 0;
     submitBtn.disabled = !hasFiles;
     payBtn.disabled = !hasFiles;
   }
 
-  uploadBox.addEventListener("click", () => proofInput.click());
+  function createPreviewItem(file) {
+    const item = document.createElement("div");
+    item.className = "preview-item";
 
-  proofInput.addEventListener("change", () => {
-    previewArea.innerHTML = "";
+    item.innerHTML = `
+      <svg viewBox="0 0 24 24"><path fill="#dbb31d" d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+      <span class="preview-file-name">${file.name}</span>
+      <button class="preview-remove-btn" type="button">&times;</button>
+    `;
 
-    [...proofInput.files].forEach((file, index) => {
-      const fileURL = URL.createObjectURL(file);
-
-      const item = document.createElement("div");
-      item.className = "simple-preview-item";
-
-      item.innerHTML = `
-        <img src="${file.type.includes('pdf') ? 'https://cdn-icons-png.flaticon.com/512/337/337946.png' : fileURL}">
-        <span>${file.name}</span>
-        <button class="remove-proof-btn">&times;</button>
-      `;
-
-      item.querySelector(".remove-proof-btn").addEventListener("click", () => {
-        const dt = new DataTransfer();
-        [...proofInput.files].forEach((f, i) => {
-          if (i !== index) dt.items.add(f);
-        });
-        proofInput.files = dt.files;
-        item.remove();
-        refreshButtons();
-      });
-
-      previewArea.appendChild(item);
+    item.querySelector(".preview-remove-btn").addEventListener("click", () => {
+      const dt = new DataTransfer();
+      for (let i = 0; i < fileInput.files.length; i++) {
+        if (fileInput.files[i] !== file) dt.items.add(fileInput.files[i]);
+      }
+      fileInput.files = dt.files;
+      item.remove();
+      toggleButtons();
     });
 
-    refreshButtons();
+    return item;
+  }
+
+  fileInput.addEventListener("change", () => {
+    previewList.innerHTML = "";
+    const validFiles = [...fileInput.files].filter(f => f.size <= MAX_FILE_SIZE);
+
+    validFiles.forEach(file => previewList.appendChild(createPreviewItem(file)));
+
+    toggleButtons();
   });
 
-  // "I have sent payment" button
+  // --- Drag & Drop ---
+  dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("dragover");
+  });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+
+    const dt = new DataTransfer();
+    [...fileInput.files, ...e.dataTransfer.files]
+      .filter((f, i, arr) => arr.findIndex(x => x.name === f.name && x.size === f.size) === i)
+      .filter(f => f.size <= MAX_FILE_SIZE)
+      .forEach(f => dt.items.add(f));
+
+    fileInput.files = dt.files;
+
+    fileInput.dispatchEvent(new Event("change"));
+  });
+
+  // --- Submit Proof Button ---
+  submitBtn.addEventListener("click", () => {
+    if (fileInput.files.length === 0) {
+      alert("Please upload your payment proof before submitting.");
+    }
+  });
+
+  // --- I Have Sent Payment ---
   payBtn.addEventListener("click", () => {
-    if (proofInput.files.length === 0) {
+    if (fileInput.files.length === 0) {
       alert("Upload payment proof first.");
       return;
     }
@@ -557,8 +551,23 @@
     payBtn.textContent = "Verification in progress...";
   });
 
-  refreshButtons();
+  toggleButtons();
 </script>
+
+
+  <style>
+    /* Screen reader only style */
+    .sr-only {
+      position: absolute !important;
+      width: 1px !important;
+      height: 1px !important;
+      padding: 0 !important;
+      margin: -1px !important;
+      overflow: hidden !important;
+      clip: rect(0, 0, 0, 0) !important;
+      border: 0 !important;
+    }
+  </style>
 </body>
 
 </html>
