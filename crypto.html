@@ -454,187 +454,111 @@
    
   </footer>
 
-  <script>
-    // Copy wallet address
-    const copyBtn = document.querySelector(".copy-btn");
-    const walletAddress = document.getElementById("wallet-address");
+<script>
+  // --- Copy wallet address ---
+  const copyBtn = document.querySelector(".copy-btn");
+  const walletAddress = document.getElementById("wallet-address");
 
-    copyBtn.addEventListener("click", () => {
-      const address = walletAddress.textContent.trim();
-      if (!navigator.clipboard) {
-        const textArea = document.createElement("textarea");
-        textArea.value = address;
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        try {
-          document.execCommand('copy');
-          alert("Wallet address copied to clipboard!");
-        } catch (err) {
-          alert("Failed to copy wallet address.");
-        }
-        document.body.removeChild(textArea);
-        return;
-      }
-      navigator.clipboard.writeText(address).then(() => {
-        copyBtn.textContent = "Copied ✓";
-        setTimeout(() => {
-          copyBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-          <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zM19 5H8a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 18H8V7h11v16z"/>
-        </svg> Copy`;
-        }, 2000);
-      }).catch(() => {
-        alert("Failed to copy wallet address.");
-      });
+  copyBtn.addEventListener("click", () => {
+    const address = walletAddress.textContent.trim();
+    navigator.clipboard.writeText(address).then(() => {
+      copyBtn.textContent = "Copied ✓";
+      setTimeout(() => {
+        copyBtn.innerHTML = `Copy`;
+      }, 2000);
     });
+  });
 
-    // Cancel button action
-    document.querySelector("header .cancel").addEventListener("click", () => {
-      if (confirm("Are you sure you want to cancel the payment?")) {
-        window.history.back();
-      }
-    });
+  // --- Upload Proof Logic ---
+  const dropzone = document.getElementById("dropzone");
+  const fileInput = document.getElementById("file-upload");
+  const previewList = document.getElementById("preview-list");
 
-    // Change payment method action & keyboard accessible
-    const changeMethod = document.querySelector("footer.footer");
-    changeMethod.addEventListener("click", () => {
-      alert("Change payment method clicked.");
-    });
-    changeMethod.addEventListener("keydown", e => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        changeMethod.click();
-      }
-    });
+  const submitBtn = document.querySelector(".submit-btn");
+  const payBtn = document.querySelector(".pay-btn");
 
-    // Upload proof functionality
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("file-upload");
-    const previewList = document.getElementById("preview-list");
-    const payBtn = document.querySelector(".pay-btn");
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
-    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  function toggleButtons() {
+    const hasFiles = fileInput.files.length > 0;
+    submitBtn.disabled = !hasFiles;
+    payBtn.disabled = !hasFiles;
+  }
 
-    function createPreviewItem(file) {
-      const item = document.createElement('div');
-      item.className = 'preview-item';
-      item.setAttribute('aria-label', `File name: ${file.name}`);
+  function createPreviewItem(file) {
+    const item = document.createElement("div");
+    item.className = "preview-item";
 
-      const fileIcon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      fileIcon.setAttribute("viewBox", "0 0 24 24");
-      fileIcon.setAttribute("aria-hidden", "true");
-      fileIcon.setAttribute("focusable", "false");
-      fileIcon.innerHTML = '<path fill="#dbb31d" d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/><path d="M14 2v5h5" fill="#fff"/>';
+    item.innerHTML = `
+      <svg viewBox="0 0 24 24"><path fill="#dbb31d" d="M6 2h9l5 5v15a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z"/></svg>
+      <span class="preview-file-name">${file.name}</span>
+      <button class="preview-remove-btn" type="button">&times;</button>
+    `;
 
-      const fileNameSpan = document.createElement('span');
-      fileNameSpan.className = 'preview-file-name';
-      fileNameSpan.textContent = file.name;
-
-      const removeBtn = document.createElement('button');
-      removeBtn.className = 'preview-remove-btn';
-      removeBtn.type = 'button';
-      removeBtn.setAttribute('title', 'Remove this file');
-      removeBtn.setAttribute('aria-label', `Remove ${file.name}`);
-      removeBtn.innerHTML = '&times;';
-
-      removeBtn.addEventListener('click', () => {
-        const dt = new DataTransfer();
-        for (let i = 0; i < fileInput.files.length; i++) {
-          if (fileInput.files[i] !== file) {
-            dt.items.add(fileInput.files[i]);
-          }
-        }
-        fileInput.files = dt.files;
-        item.remove();
-        togglePayButton();
-      });
-
-      item.appendChild(fileIcon);
-      item.appendChild(fileNameSpan);
-      item.appendChild(removeBtn);
-
-      return item;
-    }
-
-    function togglePayButton() {
-      payBtn.disabled = fileInput.files.length === 0;
-    }
-
-    fileInput.addEventListener('change', () => {
-      previewList.innerHTML = '';
-      const files = Array.from(fileInput.files);
-      const invalidFiles = files.filter(f => f.size > MAX_FILE_SIZE);
-      if (invalidFiles.length > 0) {
-        alert('One or more files exceed the 5MB size limit and will not be added.');
-      }
-
-      const validFiles = files.filter(f => f.size <= MAX_FILE_SIZE);
-      validFiles.forEach(file => previewList.appendChild(createPreviewItem(file)));
-
-      togglePayButton();
-    });
-
-    // Drag & drop handlers
-    dropzone.addEventListener('dragover', e => {
-      e.preventDefault();
-      dropzone.classList.add('dragover');
-    });
-
-    dropzone.addEventListener('dragleave', e => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-    });
-
-    dropzone.addEventListener('drop', e => {
-      e.preventDefault();
-      dropzone.classList.remove('dragover');
-
-      const droppedFiles = Array.from(e.dataTransfer.files);
-      const currentFiles = Array.from(fileInput.files);
-      let combinedFiles = currentFiles.concat(droppedFiles);
-
-      // Remove duplicates by name + size (simple)
-      combinedFiles = combinedFiles.filter((file, index, self) =>
-        index === self.findIndex(f => f.name === file.name && f.size === file.size)
-      );
-
-      // Filter files > max size
-      const invalidFiles = combinedFiles.filter(f => f.size > MAX_FILE_SIZE);
-      if (invalidFiles.length > 0) {
-        alert('Some files exceed the 5MB size limit and will not be added.');
-      }
-
-      const validFiles = combinedFiles.filter(f => f.size <= MAX_FILE_SIZE);
-      // Use DataTransfer to set files and trigger change event
+    item.querySelector(".preview-remove-btn").addEventListener("click", () => {
       const dt = new DataTransfer();
-      validFiles.forEach(f => dt.items.add(f));
+      for (let i = 0; i < fileInput.files.length; i++) {
+        if (fileInput.files[i] !== file) dt.items.add(fileInput.files[i]);
+      }
       fileInput.files = dt.files;
-
-      // Manually trigger change to update preview
-      const event = new Event('change', { bubbles: true });
-      fileInput.dispatchEvent(event);
+      item.remove();
+      toggleButtons();
     });
 
-    // Make dropzone keyboard accessible opening file dialog on Enter/Space
-    dropzone.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        fileInput.click();
-      }
-    });
+    return item;
+  }
 
-    // Confirm payment button alert
-    payBtn.addEventListener("click", () => {
-      if (fileInput.files.length === 0) {
-        alert("Please upload payment proof to confirm.");
-        return;
-      }
-      alert("Thank you! We have received your payment proof and will verify your crypto payment shortly.");
-      payBtn.disabled = true;
-      payBtn.textContent = "Verification in progress...";
-      // Here, submit form or handle payment confirmation
-    });
-  </script>
+  fileInput.addEventListener("change", () => {
+    previewList.innerHTML = "";
+    const validFiles = [...fileInput.files].filter(f => f.size <= MAX_FILE_SIZE);
+
+    validFiles.forEach(file => previewList.appendChild(createPreviewItem(file)));
+
+    toggleButtons();
+  });
+
+  // --- Drag & Drop ---
+  dropzone.addEventListener("dragover", e => {
+    e.preventDefault();
+    dropzone.classList.add("dragover");
+  });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+  dropzone.addEventListener("drop", e => {
+    e.preventDefault();
+    dropzone.classList.remove("dragover");
+
+    const dt = new DataTransfer();
+    [...fileInput.files, ...e.dataTransfer.files]
+      .filter((f, i, arr) => arr.findIndex(x => x.name === f.name && x.size === f.size) === i)
+      .filter(f => f.size <= MAX_FILE_SIZE)
+      .forEach(f => dt.items.add(f));
+
+    fileInput.files = dt.files;
+
+    fileInput.dispatchEvent(new Event("change"));
+  });
+
+  // --- Submit Proof Button ---
+  submitBtn.addEventListener("click", () => {
+    if (fileInput.files.length === 0) {
+      alert("Please upload your payment proof before submitting.");
+    }
+  });
+
+  // --- I Have Sent Payment ---
+  payBtn.addEventListener("click", () => {
+    if (fileInput.files.length === 0) {
+      alert("Upload payment proof first.");
+      return;
+    }
+    alert("Thank you! Verification will begin shortly.");
+    payBtn.disabled = true;
+    payBtn.textContent = "Verification in progress...";
+  });
+
+  toggleButtons();
+</script>
+
 
   <style>
     /* Screen reader only style */
